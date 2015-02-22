@@ -1,16 +1,19 @@
 $(function() {
 
-	var beatValue = 2;
+	var beatID = 2;
+	beatAmount = 1;
 	var lastKey = ""
+	var beat = new Object();
+	var beats = [];
+	var intervalIDs = [];
 
 	$('#addBeat').click(function() {
-		$('.beats').append("<div class=\"beat\"><label for=\"bpm\">Beat " + beatValue + ": </label><input id=\"bpm\" type=\"number\" /></div>");
-		console.log(beatValue);
-		beatValue = beatValue + 1;
-		console.log(beatValue);
+		$('.beats').append("<div class=\"beat\"><label for=\"bpm-" + beatID + "\">Beat " + beatID + ": </label><input id=\"bpm-" + beatID + "\" type=\"number\" /><input id=\"sound-" + beatID + "\" /></div>");
+		beatID = beatID + 1;
+		beatAmount = beatAmount + 1;
 	})
 	
-
+	// all the donald sounds
 	var ds1 = new Howl({
 		urls: ['../donaldsounds/ds1.mp3']
 	});
@@ -68,13 +71,12 @@ $(function() {
 	});
 
 
-
-
-
-
 	$(document).keypress(function(event) {
 		keycode = (event.keyCode ? event.keyCode : event.which);
-		console.log(event);
+
+		lastKey = String.fromCharCode(keycode);
+		console.log(keycode);
+
 
 		switch(keycode) {
 			case 113:
@@ -136,89 +138,87 @@ $(function() {
 		}
 	});
 
-	function startBeat(beatAmount) {
-		beatAmount = 60000 / beatAmount; //Convert to actual beats per minute
-
-		switch(beatSound) {
-			case 113:
-				intervalID = window.setInterval(function() { ds1.play() }, beatAmount);
-				console.log(intervalID);
+	function startBeat(amount, sound) {
+		console.log("bpm:" + amount);
+		console.log("sound value:" + sound);
+		switch(sound) {
+			case "q":
+				intervalIDs.push(window.setInterval(function() { ds1.play() }, amount));
 				break;
-			case 119:
-				intervalID = window.setInterval(function() { ds2.play() }, beatAmount);
-				console.log(intervalID);
+			case "w":
+				intervalIDs.push(window.setInterval(function() { ds2.play() }, amount));
 				break;
-			case 101:
-				intervalID = window.setInterval(function() { ds3.play() }, beatAmount);
-				console.log(intervalID);
+			case "e":
+				intervalIDs.push(window.setInterval(function() { ds3.play() }, amount));
 				break;
-			case 114:
-				intervalID = window.setInterval(function() { ds4.play() }, beatAmount);
-				console.log(intervalID);
+			case "r":
+				intervalIDs.push(window.setInterval(function() { ds4.play() }, amount));
 				break;
-			case 116:
-				intervalID = window.setInterval(function() { ds5.play() }, beatAmount);
-				console.log(intervalID);
+			case "t":
+				intervalIDs.push(window.setInterval(function() { ds5.play() }, amount));
 				break;
-			case 121:
-				intervalID = window.setInterval(function() { ds6.play() }, beatAmount);
-				console.log(intervalID);
+			case "y":
+				intervalIDs.push(window.setInterval(function() { ds6.play() }, amount));
 				break;
-			case 117:
-				intervalID = window.setInterval(function() { ds7.play() }, beatAmount);
-				console.log(intervalID);
+			case "u":
+				intervalIDs.push(window.setInterval(function() { ds7.play() }, amount));
 				break;
-			case 105:
-				intervalID = window.setInterval(function() { ds8.play() }, beatAmount);
-				console.log(intervalID);
+			case "i":
+				intervalIDs.push(window.setInterval(function() { ds8.play() }, amount));
 				break;
-			case 111:
-				intervalID = window.setInterval(function() { ds9.play() }, beatAmount);
-				console.log(intervalID);
+			case "o":
+				intervalIDs.push(window.setInterval(function() { ds9.play() }, amount));
 				break;
-			case 112:
-				intervalID = window.setInterval(function() { ds10.play() }, beatAmount);
-				console.log(intervalID);
+			case "p":
+				intervalIDs.push(window.setInterval(function() { ds10.play() }, amount));
 				break;
-			case 97:
-				intervalID = window.setInterval(function() { ds11.play() }, beatAmount);
-				console.log(intervalID);
+			case "a":
+				intervalIDs.push(window.setInterval(function() { ds11.play() }, amount));
 				break;
-			case 115:
-				intervalID = window.setInterval(function() { ds12.play() }, beatAmount);
-				console.log(intervalID);
+			case "s":
+				intervalIDs.push(window.setInterval(function() { ds12.play() }, amount));
 				break;
-			case 100:
-				intervalID = window.setInterval(function() { ds13.play() }, beatAmount);
-				console.log(intervalID);
+			case "d":
+				intervalIDs.push(window.setInterval(function() { ds13.play() }, amount));
 				break;
-			case 102:
-				intervalID = window.setInterval(function() { ds14.play() }, beatAmount);
-				console.log(intervalID);
+			case "f":
+				intervalIDs.push(window.setInterval(function() { ds14.play() }, amount));
 				break;
 		}
 	}
 
+	//start all beat, awww yeah
 	$("#beatStart").click(function() {
-		console.log($("#beatStart").text());
 		if($("#beatStart").text() == "Start Beat") {
 			$("#beatStart").html('Stop Beat');
-			var bpm = $("#bpm").val();
 
-			startBeat(bpm);
+			for(var i = 1; i <= beatAmount; i++) {
+				if($("#bpm-" + i).val() != "") {
+					var bpm = 60000 / $("#bpm-" + i).val(); // convert and store BPM value
+					var soundKey = $("#sound-" + i).val();
+					beats.push({ "ID" : i, "bpm" : bpm });
+					
+					startBeat(bpm, soundKey);
+				}
+			}
+
 		} else {
+			beats = [];
 			$("#beatStart").html('Start Beat');
 
-			window.clearInterval(intervalID);
+			for(var i = 1; i <= beatAmount; i++) {
+				window.clearInterval(intervalIDs[i]);
+			}
 		}
 	});
 
+	//minimizes beatmaker box
 	$("#closeBeatmaker").click(function() {
 		$(".instructions").toggleClass("closed");
 	});
 });
 
-
+	// ridiculous javascript for the scrolling tab text
 	title = "Mary Nastasi is #1 Girlfriend";
 	var rev = "fwd";
 	function titlebar(val)
